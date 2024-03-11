@@ -14,7 +14,10 @@
 切换同级目录路径下的爬虫结果  
 一个不断完善的设置界面，自定义阅读体验  
 
-# 下载  
+# 安装  
+PC下载后运行：  
+
+exe文件：[v1.0.0版本](https://github.com/nibaba1892/CNKI_VIEW/releases/tag/First)  
 
 # 改进目标  
 

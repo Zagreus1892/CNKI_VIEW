@@ -229,8 +229,6 @@ def crawl(shared_list,papers_need, theme ,duandian,num=1):
                     count-=error
 
                 # 跳过本条，接着下一个
-                #count += 1
-                #原作者漏了这一行，导致bug！
                 continue
             finally:
                 # 如果有多个窗口，关闭第二个窗口， 切换回主页

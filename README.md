@@ -15,7 +15,7 @@
 - 一个不断完善的设置界面，自定义阅读体验  
 
 # 界面
-<img width="1154" height="651" alt="image" src="https://github.com/user-attachments/assets/701376b2-ccd0-4516-acfa-2a1029475ba2" />
+<img width="1154" height="651" alt="image" src="https://github.com/user-attachments/assets/0151ec66-debb-4c2a-8352-047289fae3c4" />
 
 # 安装  
 **PC下载后运行：**  

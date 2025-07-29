@@ -26,8 +26,8 @@ cscd中文库csv下载后才有核心标注功能
 exe文件：[v1.0.0版本](https://github.com/Zagreus1892/CNKI_VIEW/releases/tag/First)  
 
 # 改进目标  
-收藏功能
-内部排序
-设置表头显示信息
+收藏功能  
+内部排序  
+设置表头显示信息  
 插件api
 

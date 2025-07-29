@@ -15,15 +15,19 @@
 - 一个不断完善的设置界面，自定义阅读体验  
 
 # 界面
-<img width="1154" height="651" alt="image" src="https://github.com/user-attachments/assets/0151ec66-debb-4c2a-8352-047289fae3c4" />
+<img width="1154" height="651" alt="image" src="https://github.com/user-attachments/assets/31fa4acb-7571-4300-8c2f-fa31ba4b4789" />
 
 # 安装  
 **PC下载后运行：**  
 两个版本：lite版仅有查看功能，full版有爬虫功能  
-但需要下载对应浏览器驱动msedgedriver  
+selenium爬虫需要下载对应浏览器驱动msedgedriver  
+request爬虫则不需要
 cscd中文库csv下载后才有核心标注功能  
 exe文件：[v1.0.0版本](https://github.com/Zagreus1892/CNKI_VIEW/releases/tag/First)  
 
 # 改进目标  
-
+收藏功能
+内部排序
+设置表头显示信息
+插件api
 

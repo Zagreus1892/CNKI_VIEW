@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsSce
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect,QListWidgetItem,QHeaderView
 from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QPushButton, QProgressBar
 from PyQt5.QtGui import QPixmap, QImage ,QColor
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
 
 import ui_b as ui
 import os
@@ -167,10 +167,7 @@ class mainWindow(QMainWindow):
             self.font=self.setdata['font']
             self.additon=self.setdata['additon']
             self.choose=self.setdata['file']
-            self.size=self.setdata['size']
-
-
-        
+            self.size=self.setdata['size']   
 
         self.cscd=cscd
 
@@ -179,6 +176,18 @@ class mainWindow(QMainWindow):
 
         #加一句这个才能随窗口缩放
         self.setCentralWidget(self.ui.horizontalLayout_0)
+
+        # 获取屏幕大小
+        screen = QDesktopWidget().availableGeometry()
+        #print(window_width,window_height,screen.width(),screen.height())
+        self.screen_width = screen.width()
+        self.screen_height = screen.height()
+        
+        # 自定义新窗口大小
+        new_window_width = int(self.screen_width * self.size)
+        new_window_height = int(self.screen_height * self.size)
+        print(new_window_width,new_window_height)
+        self.resize(new_window_width, new_window_height) 
 
         #self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
         #self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -303,17 +312,6 @@ class mainWindow(QMainWindow):
         self.ui.listWidget.itemClicked.connect(self.on_item_clicked)
         self.ui.pushButton_2.clicked.connect(self.set)
        
-        #self.auto_resize()
-        #self.auto_resize(0.9)
-        #self.auto_resize(0.6)
-        
-        #self.showFullScreen()
-        #print(self.windowState())
-
-
-        #获取组件初始位置和大小
-        self.window_width = self.width()
-        self.window_height = self.height()
         rect=[]
         for widget in self.findChildren(QWidget):
             rect.append(widget.geometry())
@@ -323,28 +321,10 @@ class mainWindow(QMainWindow):
         self.auto_resize(self.size)
         self.new_tab(self.choose)
 
-    '''
-    def keyPressEvent(self,event):
-        #print("按下：" + str(event.key()))
-        if event.key() == 16777249 and self.size<1:
-            #按下：16777248:
-            #print("按下了ctrl键")
-            self.size+=0.1
-            
-            
-        if event.key() == 16777248 and self.size>0.3:
-            #按下：16777248:
-            #print("按下了shift键")
-            self.size-=0.1
-        #if event.key() == 16777252:
-            #self.additon += 1
-        self.size = round(self.size,1)
-        self.auto_resize(self.size)
-        #self.new_tab(self.choose)
-        #self.on_selection_changed()
-        self.fresh()
-        print(f'size_now: {self.size}')
-    '''
+        # 初始化节流计时器
+        self.resize_timer = QTimer()
+        self.resize_timer.setSingleShot(True)  # 单次触发
+        self.resize_timer.timeout.connect(self.handle_resize)
 
     # 滚轮事件 
     def wheelEvent(self, ev):
@@ -365,6 +345,21 @@ class mainWindow(QMainWindow):
             self.fresh()
             print(f'size_now: {self.size}')
 
+    # 窗口缩放事件
+    def resizeEvent(self, event):
+           super().resizeEvent(event)
+           # 每次resize事件重启计时器（延迟200ms执行）
+           self.resize_timer.start(100)  # 200毫秒内只触发一次
+       
+    def handle_resize(self):
+       """节流处理函数"""
+       
+       self.size = round(self.width()/self.screen_width,1)
+       #print(self.size)
+       self.auto_resize(self.size)
+       self.fresh()
+
+
     def auto_resize(self,size=0.6):
         
         size=self.size
@@ -377,22 +372,10 @@ class mainWindow(QMainWindow):
         #default_width=1088
         #default_height=612
         
-        
-        #把获取当前改成以初始状态为基准就ok了
-        window_width = self.window_width
-        window_height = self.window_height
-
-        # 获取屏幕大小
-        screen = QDesktopWidget().availableGeometry()
-        #print(window_width,window_height,screen.width(),screen.height())
-        screen_width = screen.width()
-        screen_height = screen.height()
-        # 自定义新窗口大小
-        new_window_width = int(screen_width * size)
-        resize_rate = new_window_width / window_width  # 确定放大比例
-        new_window_height = int(window_height * resize_rate)  # 确定新窗口高度
         # 重新调整窗口大小并移动到屏幕中心
-        self.resize(new_window_width, new_window_height)
+        #self.resize(new_window_width, new_window_height)
+        
+
         #self.move((screen_width - new_window_width) // 2, (screen_height - new_window_height) // 3)
         # 重新调整子控件位置大小
         #fsize=int(-23.33*(size**2)+28.996*size)
@@ -405,12 +388,6 @@ class mainWindow(QMainWindow):
             fsize=int(9*size/0.6)+1
               
         for widget,rect in zip(self.findChildren(QWidget),self.default_rect):
-            #rect = widget.geometry()
-            widget.setGeometry(QtCore.QRect(
-                int(rect.x() * resize_rate),
-                int(rect.y() * resize_rate),
-                int(rect.width() * resize_rate),
-                int(rect.height() * resize_rate),))
             if widget in [self.ui.label,self.ui.label_2,self.ui.pushButton]:
                 #print(widget)
                 font = QtGui.QFont()                
@@ -542,7 +519,7 @@ class mainWindow(QMainWindow):
         self.setting.fontComboBox.setCurrentFont(ff)
         self.setting.spinBox.setValue(self.additon)
 
-        self.setting.buttonBox.clicked.connect(self.save)
+        self.setting.buttonBox.accepted.connect(self.save)
         self.setting.buttonBox.rejected.connect(self.cancel)
     def save(self):
         self.additon=self.setting.spinBox.value()
@@ -553,7 +530,7 @@ class mainWindow(QMainWindow):
         self.setdata['additon']=self.additon
         with open(r'setting.json','w') as f:
             json.dump(self.setdata,f)
-        
+        self.setting.close()
     def cancel(self):
         self.setting.close()
     def new_tab(self,file='A_Sample.tsv'):
@@ -650,12 +627,11 @@ class mainWindow(QMainWindow):
         title_length = int(self.width()/19*12)-int(18*length*bili)-self.ui.tableWidget.columnWidth(0)-self.ui.tableWidget.columnWidth(1)-int(s*22)+g
         self.ui.tableWidget.setColumnWidth(2, title_length)
         
-        print(f'title_length: {title_length}',end='\t')
-        print(f'{[int(self.width()/19*12),int(18*length*bili),self.ui.tableWidget.columnWidth(0),self.ui.tableWidget.columnWidth(1)]}',end='\t')
-        #莫名其妙，其实完全没必要考虑滚动条长度，不知道哪抄的
-        #self.ui.tableWidget.verticalScrollBar().width(), horizontalScrollBar
+        #print(f'title_length: {title_length}',end='\t')
+        #print(f'{[int(self.width()/19*12),int(18*length*bili),self.ui.tableWidget.columnWidth(0),self.ui.tableWidget.columnWidth(1)]}',end='\t')
         
         self.ui.tableWidget.horizontalHeader().setSectionResizeMode(3,QHeaderView.Stretch)
+
 
         #os.walk疑似内部有文件夹才能生效
         path=os.getcwd()

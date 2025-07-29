@@ -459,11 +459,12 @@ class mainWindow(QMainWindow):
             [self.ui.tableWidget,self.ui.textEdit]
         self.fsize=fsize
         #print(f'当前字号： {fsize}')
+        print(f'size now： {self.size}')
     
 
     def fresh(self):
         #self.label.setText('Thread finished.')
-        print('更新数据',end=' ')
+        print('更新数据')
         self.new_tab(self.choose)
         try:
             #更新摘要文字和链接
@@ -606,8 +607,12 @@ class mainWindow(QMainWindow):
                 if j != 2:
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         
-        length = self.ui.tableWidget.fontMetrics().averageCharWidth()
+        #等于8就挺好了 fontMetrics感觉各个平台还不一样
+        #length = self.ui.tableWidget.fontMetrics().averageCharWidth()
+        length = 8
+        #print(length)
         #length = self.fsize
+        
         #print('字符长度：{}'.format(length))
         bili=self.fsize/9
 

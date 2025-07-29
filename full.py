@@ -8,12 +8,27 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import ui
 import os
 import sys
-import time 
+import time
+
 import json
 from cnkimp import search
 from multiprocessing import freeze_support
 import pandas as pd
 import math
+
+from dateutil import parser
+
+def normalize_date(date_str):
+    try:
+        # 预处理：替换全角冒号，提取日期部分
+        processed = date_str.replace('：', ':').strip()
+        date_part = processed.split()[0]  # 分割空格前的日期部分
+        # 解析日期，优先年在前
+        dt = parser.parse(date_part, yearfirst=True, fuzzy=True)
+        return dt.strftime("%Y-%m-%d")
+    except:
+        return None  # 解析失败返回None，可自定义处理错误
+
 # 爬虫线程
 class WorkerThread(QThread):
     progress_signal = pyqtSignal(str)
@@ -413,6 +428,7 @@ class mainWindow(QMainWindow):
         self.auto_resize(self.size)
         self.new_tab(self.choose)
 
+    '''
     def keyPressEvent(self,event):
         #print("按下：" + str(event.key()))
         if event.key() == 16777249 and self.size<1:
@@ -433,6 +449,26 @@ class mainWindow(QMainWindow):
         #self.on_selection_changed()
         self.fresh()
         print(f'size_now: {self.size}')
+    '''
+
+    # 滚轮事件 
+    def wheelEvent(self, ev):
+        mods = ev.modifiers()
+        delta = ev.angleDelta()
+        if QtCore.Qt.ControlModifier == int(mods):
+            #print(delta.y())
+            if int(delta.y())>0 and self.size<1:
+                print("ctrl 向上滚轮")
+                self.size+=0.1
+            if int(delta.y())<0 and self.size>0.3:
+                print("ctrl 向下滚轮")
+                self.size-=0.1
+            self.size = round(self.size,1)
+            self.auto_resize(self.size)
+            #self.new_tab(self.choose)
+            #self.on_selection_changed()
+            self.fresh()
+            print(f'size_now: {self.size}')
 
     def auto_resize(self,size=0.6):
         
@@ -652,7 +688,7 @@ class mainWindow(QMainWindow):
             self.cell=selected_cells[0]
             #print(f"序号：{self.cell.row()+1}")
             #self.ui.textEdit.setPlainText('摘要：\n      '+self.abstr.loc[self.cell.row(),'摘要'])
-            self.ui.textEdit.setPlainText('      '+self.abstr.loc[self.cell.row(),'摘要'])
+            self.ui.textEdit.setPlainText('      '+str(self.abstr.loc[self.cell.row(),'摘要']))
             adress=self.abstr.loc[self.cell.row(),'链接']
             #print(adress)
             self.net="<a href=\""+adress+"\">&emsp;CNKI链接跳转</a>"
@@ -705,7 +741,9 @@ class mainWindow(QMainWindow):
         #我也不知道-哪来的
         for i in range(len(df)):
             word=riqi.loc[i]
-            #print(word)
+            word=normalize_date(word)
+            theriqi.append(word)
+            '''
             try:
                 num=word.split('/')
             except:
@@ -719,6 +757,7 @@ class mainWindow(QMainWindow):
                 num[2]='0'+num[2]
             word=num[0]+'-'+num[1]+'-'+num[2]
             theriqi.append(word)
+            '''
         theriqi=pd.DataFrame(theriqi,columns=['日期'])
         df.loc[:,'日期']=theriqi
         # 创建一个映射函数
@@ -776,7 +815,7 @@ class mainWindow(QMainWindow):
         #self.ui.tableWidget.setColumnWidth(2, 300)
 
         #表index的位数
-        s=int(math.log10(len(df)))
+        s=int(math.log10(len(df)+1))
         if self.size <= 0.5:
             g = int(3*length*bili)
         else:

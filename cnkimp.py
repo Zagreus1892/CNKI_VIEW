@@ -114,7 +114,7 @@ def crawl(shared_list,papers_need, theme ,duandian,num=1):
     count+=duandian
     papers_need+=duandian
     turn=duandian//50
-    if turn>=8 and duandian != 400:
+    if turn>=8:
         time.sleep(1)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[2]/div[2]/div[2]/div[2]/div/div[2]/div/div[2]/div[9]"))).click()
         turn-=8
@@ -262,12 +262,11 @@ def crawl(shared_list,papers_need, theme ,duandian,num=1):
             break
         else:
             # 切换到下一页
-            #whats wrong?
             try:
                 WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//a[@id='PageNext']"))).click()
                 duandian=0
             except:
-                print('the last page')
+                print('没有下一页')
                 break
     # 用quit不用close
     driver.quit()

@@ -29,5 +29,6 @@ exe文件：[v1.0.0版本](https://github.com/Zagreus1892/CNKI_VIEW/releases/tag
 收藏功能  
 内部排序  
 设置表头显示信息  
+优化读取pandas速度  
 插件api
 
